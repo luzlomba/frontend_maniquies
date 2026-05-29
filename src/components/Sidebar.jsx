@@ -1,4 +1,4 @@
-function Sidebar() {
+function Sidebar({ setView }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -7,16 +7,16 @@ function Sidebar() {
       </div>
       <nav className="sidebar-nav">
         <ul>
-          <li>Inicio</li>
-          <li>Ensamblador</li>
-          <li>Piezas</li>
-          <li>Maniquíes</li>
-          <li>Materiales</li>
-          <li>Colores</li>
+          <li onClick={() => setView('inicio')}>Inicio</li>
+          <li onClick={() => setView('ensamblador')}>Ensamblador</li>
+          <li onClick={() => setView('piezas')}>Piezas</li>
+          <li onClick={() => setView('maniquies')}>Maniquíes</li>
+          <li onClick={() => setView('materiales')}>Materiales</li>
+          <li onClick={() => setView('colores')}>Colores</li>
         </ul>
       </nav>
       <div className="sidebar-footer">
-        <a href="mailto:fabrica_de_maniquies@gmail.com">📧 Contacto</a>
+        <a href="mailto:tu@email.com">📧 Contacto</a>
       </div>
     </aside>
   )
