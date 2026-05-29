@@ -4,6 +4,7 @@ import ManiquiesList from './components/ManiquiesList'
 import Sidebar from './components/Sidebar'
 import './App.css'
 import { cabezas, torsos, brazos, piernas, modelosPieza, modelosExtremidad, materiales, colores, maniquies } from './data/data'
+import Assembler from './components/Assembler'
 
 function App() {
 
@@ -51,6 +52,16 @@ function App() {
 
       {view === 'maniquies' && (
         <ManiquiesList maniquies={maniquies} />
+      )}
+
+      {view === 'ensamblador' && (
+        <Assembler 
+          cabezas={cabezas}
+          torsos={torsos}
+          brazos={brazos}
+          piernas={piernas}
+          modelosExtremidad={modelosExtremidad}
+        />
       )}
 
     </main>
