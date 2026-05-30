@@ -1,155 +1,115 @@
 import { useState } from 'react'
 
-function Assembler({ cabezas, torsos, brazos, piernas, modelosExtremidad }) {
-
+function Assembler({ stockDisponible, cabezas, torsos, brazos, piernas, modelosPieza, modelosExtremidad, materiales, colores, maniquies, setManiquies }) {
   const [selection, setSelection] = useState({
-    id_cabeza: null,
-    id_torso: null,
-    id_brazo_izq: null,
-    id_brazo_der: null,
-    id_pierna_izq: null,
-    id_pierna_der: null
+    id_cabeza: null, id_torso: null, id_brazo_izq: null, id_brazo_der: null, id_pierna_izq: null, id_pierna_der: null
   })
+  const [openSection, setOpenSection] = useState(null)
+  
+  // Estados para los filtros
+  const [filterColor, setFilterColor] = useState('todos')
+  const [filterMaterial, setFilterMaterial] = useState('todos')
 
   const handleSelect = (tipo, id) => {
-    setSelection({ ...selection, [tipo]: id })
+    setSelection(prev => ({ ...prev, [tipo]: prev[tipo] === id ? null : id }))
   }
 
-  const brazosIzq = brazos.filter(b => {
-    const modelo = modelosExtremidad.find(m => m.id_modelo === b.id_modelo)
-    return modelo?.lado === 'izquierdo'
-  })
-
-  const brazosDer = brazos.filter(b => {
-    const modelo = modelosExtremidad.find(m => m.id_modelo === b.id_modelo)
-    return modelo?.lado === 'derecho'
-  })
-
-  const piernasIzq = piernas.filter(p => {
-    const modelo = modelosExtremidad.find(m => m.id_modelo === p.id_modelo)
-    return modelo?.lado === 'izquierdo'
-  })
-
-  const piernasDer = piernas.filter(p => {
-    const modelo = modelosExtremidad.find(m => m.id_modelo === p.id_modelo)
-    return modelo?.lado === 'derecho'
-  })
-
-  const [openSection, setOpenSection] = useState(null)
-
   const toggleSection = (section) => {
-  setOpenSection(openSection === section ? null : section)
+    setOpenSection(openSection === section ? null : section)
+  }
+
+  // Lógica de filtrado por atributos
+  const filterByAttributes = (lista) => {
+    return lista.filter(p => {
+      // Obtenemos el modelo de la pieza (según si es extremidad o pieza principal)
+      const modelo = modelosPieza.find(m => m.id_modelo === p.id_modelo) || 
+                     modelosExtremidad.find(m => m.id_modelo === p.id_modelo);
+      
+      const matchColor = filterColor === 'todos' || modelo?.id_color === parseInt(filterColor);
+      const matchMaterial = filterMaterial === 'todos' || modelo?.id_material === parseInt(filterMaterial);
+      
+      return matchColor && matchMaterial;
+    });
+  };
+
+  const enUsoIds = {
+    cabeza: maniquies.map(m => m.id_cabeza),
+    torso: maniquies.map(m => m.id_torso),
+    brazo: [...maniquies.map(m => m.id_brazo_izq), ...maniquies.map(m => m.id_brazo_der)],
+    pierna: [...maniquies.map(m => m.id_pierna_izq), ...maniquies.map(m => m.id_pierna_der)]
+  }
+
+  const disp = {
+    cabezas: cabezas.filter(p => !enUsoIds.cabeza.includes(p.id_cabeza)),
+    torsos: torsos.filter(p => !enUsoIds.torso.includes(p.id_torso)),
+    brazosIzq: brazos.filter(p => !enUsoIds.brazo.includes(p.id_brazo) && modelosExtremidad.find(m => m.id_modelo === p.id_modelo)?.lado === 'izquierdo'),
+    brazosDer: brazos.filter(p => !enUsoIds.brazo.includes(p.id_brazo) && modelosExtremidad.find(m => m.id_modelo === p.id_modelo)?.lado === 'derecho'),
+    piernasIzq: piernas.filter(p => !enUsoIds.pierna.includes(p.id_pierna) && modelosExtremidad.find(m => m.id_modelo === p.id_modelo)?.lado === 'izquierdo'),
+    piernasDer: piernas.filter(p => !enUsoIds.pierna.includes(p.id_pierna) && modelosExtremidad.find(m => m.id_modelo === p.id_modelo)?.lado === 'derecho')
+  }
+
+  const getSer = (lista, id, field) => lista.find(p => p[field] === id)?.nro_serie || '-'
+
+  const handleAssemble = () => {
+    if (Object.values(selection).includes(null)) return alert('Debés completar todas las piezas')
+    setManiquies([...maniquies, { id_maniqui: Date.now(), ...selection }])
+    setSelection({ id_cabeza: null, id_torso: null, id_brazo_izq: null, id_brazo_der: null, id_pierna_izq: null, id_pierna_der: null })
   }
 
   return (
     <div className="assembler">
       <h2>Ensamblador</h2>
-      <div className="assembler-layout">
+      
+      {/* Filtros */}
+      <div className="filters">
+        <select onChange={(e) => setFilterColor(e.target.value)}>
+          <option value="todos">Todos los colores</option>
+          {colores.map(c => <option key={c.id_color} value={c.id_color}>{c.nombre}</option>)}
+        </select>
+        <select onChange={(e) => setFilterMaterial(e.target.value)}>
+          <option value="todos">Todos los materiales</option>
+          {materiales.map(m => <option key={m.id_material} value={m.id_material}>{m.nombre}</option>)}
+        </select>
+      </div>
 
+      <div className="assembler-layout">
         <div className="assembler-left">
           <h3>Piezas disponibles</h3>
-          <div className="assembler-sections">
-
-            <div>
-  <div className="accordion-header" onClick={() => toggleSection('cabezas')}>
-    <span>Cabezas</span>
-    <span>{openSection === 'cabezas' ? '▲' : '▼'}</span>
-  </div>
-  {openSection === 'cabezas' && cabezas.map(c => (
-    <div key={c.id_cabeza}
-      className={selection.id_cabeza === c.id_cabeza ? 'piece-option selected' : 'piece-option'}
-      onClick={() => handleSelect('id_cabeza', c.id_cabeza)}>
-      {c.nro_serie}
-    </div>
-  ))}
-    </div>
-        <div>
-            <div className="accordion-header" onClick={() => toggleSection('torsos')}>
-                <span>Torsos</span>
-                <span>{openSection === 'torsos' ? '▲' : '▼'}</span>
-            </div>
-            {openSection === 'torsos' && torsos.map(t => (
-                <div key={t.id_torso}
-                className={selection.id_torso === t.id_torso ? 'piece-option selected' : 'piece-option'}
-                onClick={() => handleSelect('id_torso', t.id_torso)}>
-                {t.nro_serie}
+          {[
+            { id: 'cabezas', title: 'Cabezas', data: disp.cabezas, key: 'id_cabeza', stateKey: 'id_cabeza' },
+            { id: 'torsos', title: 'Torsos', data: disp.torsos, key: 'id_torso', stateKey: 'id_torso' },
+            { id: 'brazosIzq', title: 'Brazos Izquierdos', data: disp.brazosIzq, key: 'id_brazo', stateKey: 'id_brazo_izq' },
+            { id: 'brazosDer', title: 'Brazos Derechos', data: disp.brazosDer, key: 'id_brazo', stateKey: 'id_brazo_der' },
+            { id: 'piernasIzq', title: 'Piernas Izquierdas', data: disp.piernasIzq, key: 'id_pierna', stateKey: 'id_pierna_izq' },
+            { id: 'piernasDer', title: 'Piernas Derechas', data: disp.piernasDer, key: 'id_pierna', stateKey: 'id_pierna_der' }
+          ].map(sec => {
+            const dataFiltrada = filterByAttributes(sec.data);
+            return (
+              <div key={sec.id} className="accordion">
+                <div className="accordion-header" onClick={() => toggleSection(sec.id)}>
+                  {sec.title} ({dataFiltrada.length}) {openSection === sec.id ? '▲' : '▼'}
                 </div>
-            ))}
-            </div>
-
-            <div>
-            <div className="accordion-header" onClick={() => toggleSection('brazosIzq')}>
-                <span>Brazos izquierdos</span>
-                <span>{openSection === 'brazosIzq' ? '▲' : '▼'}</span>
-            </div>
-            {openSection === 'brazosIzq' && brazosIzq.map(b => (
-                <div key={b.id_brazo}
-                className={selection.id_brazo_izq === b.id_brazo ? 'piece-option selected' : 'piece-option'}
-                onClick={() => handleSelect('id_brazo_izq', b.id_brazo)}>
-                {b.nro_serie}
-                </div>
-            ))}
-            </div>
-
-            <div>
-            <div className="accordion-header" onClick={() => toggleSection('brazosDer')}>
-                <span>Brazos derechos</span>
-                <span>{openSection === 'brazosDer' ? '▲' : '▼'}</span>
-            </div>
-            {openSection === 'brazosDer' && brazosDer.map(b => (
-                <div key={b.id_brazo}
-                className={selection.id_brazo_der === b.id_brazo ? 'piece-option selected' : 'piece-option'}
-                onClick={() => handleSelect('id_brazo_der', b.id_brazo)}>
-                {b.nro_serie}
-                </div>
-            ))}
-            </div>
-
-            <div>
-            <div className="accordion-header" onClick={() => toggleSection('piernasIzq')}>
-                <span>Piernas izquierdas</span>
-                <span>{openSection === 'piernasIzq' ? '▲' : '▼'}</span>
-            </div>
-            {openSection === 'piernasIzq' && piernasIzq.map(p => (
-                <div key={p.id_pierna}
-                className={selection.id_pierna_izq === p.id_pierna ? 'piece-option selected' : 'piece-option'}
-                onClick={() => handleSelect('id_pierna_izq', p.id_pierna)}>
-                {p.nro_serie}
-                </div>
-            ))}
-            </div>
-
-            <div>
-            <div className="accordion-header" onClick={() => toggleSection('piernasDer')}>
-                <span>Piernas derechas</span>
-                <span>{openSection === 'piernasDer' ? '▲' : '▼'}</span>
-            </div>
-            {openSection === 'piernasDer' && piernasDer.map(p => (
-                <div key={p.id_pierna}
-                className={selection.id_pierna_der === p.id_pierna ? 'piece-option selected' : 'piece-option'}
-                onClick={() => handleSelect('id_pierna_der', p.id_pierna)}>
-                {p.nro_serie}
-                </div>
-            ))}
-            </div>
-          </div>
+                {openSection === sec.id && dataFiltrada.map(p => (
+                  <div key={p[sec.key]} className={selection[sec.stateKey] === p[sec.key] ? 'piece-option selected' : 'piece-option'} onClick={() => handleSelect(sec.stateKey, p[sec.key])}>
+                    {p.nro_serie}
+                  </div>
+                ))}
+              </div>
+            )
+          })}
         </div>
-
+        
         <div className="assembler-right">
-          <h3>Maniquí en construcción</h3>
-          <p>Cabeza: {selection.id_cabeza || '-'}</p>
-          <p>Torso: {selection.id_torso || '-'}</p>
-          <p>Brazo izq: {selection.id_brazo_izq || '-'}</p>
-          <p>Brazo der: {selection.id_brazo_der || '-'}</p>
-          <p>Pierna izq: {selection.id_pierna_izq || '-'}</p>
-          <p>Pierna der: {selection.id_pierna_der || '-'}</p>
+            <h3>Maniquí en construcción</h3>
+            <p>Cabeza: {getSer(cabezas, selection.id_cabeza, 'id_cabeza')}</p>
+            <p>Torso: {getSer(torsos, selection.id_torso, 'id_torso')}</p>
+            <p>Brazo izq: {getSer(brazos, selection.id_brazo_izq, 'id_brazo')}</p>
+            <p>Brazo der: {getSer(brazos, selection.id_brazo_der, 'id_brazo')}</p>
+            <p>Pierna izq: {getSer(piernas, selection.id_pierna_izq, 'id_pierna')}</p>
+            <p>Pierna der: {getSer(piernas, selection.id_pierna_der, 'id_pierna')}</p>
         </div>
-
       </div>
-      <button className="assemble-btn"
-        onClick={() => console.log('Ensamblar:', selection)}>
-        Ensamblar maniquí →
-      </button>
+      <button className="assemble-btn" onClick={handleAssemble}>Ensamblar Maniquí</button>
     </div>
   )
 }
