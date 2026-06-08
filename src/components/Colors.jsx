@@ -18,20 +18,14 @@ function Colors({ colors, setColors }) {
     <div className="view-container">
       <h2>Manage Colors</h2>
       
-      <form onSubmit={handleAdd} className="filters" style={{ justifyContent: 'flex-start' }}>
+      <form onSubmit={handleAdd} className="filters filters-left">
         <input 
           className="input-field"
           value={newColorName}
           onChange={(e) => setNewColorName(e.target.value)}
           placeholder="Ingresar Nombre del Color"
         />
-        <button 
-            type="submit" 
-            className="btn-action btn-edit"
-            style={{ marginRight: '0' }}
-            >
-            Agregar Color
-        </button>
+        <button type="submit" className="btn-action btn-edit no-margin"> Agregar Color </button>
       </form>
 
       <table className="table-container">

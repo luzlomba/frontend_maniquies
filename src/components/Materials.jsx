@@ -18,7 +18,7 @@ function Materials({ materials, setMaterials }) {
     <div className="view-container">
       <h2>Manage Materials</h2>
       
-      <form onSubmit={handleAdd} className="filters" style={{ justifyContent: 'flex-start' }}>
+      <form onSubmit={handleAdd} className="filters filters-left">
         <input 
           className="input-field"
           value={newMaterialName}

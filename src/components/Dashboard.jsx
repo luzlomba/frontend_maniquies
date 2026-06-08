@@ -15,9 +15,9 @@ function Dashboard({ maniquies, stockDisponible }) {
         </div>
       </div>
 
-      <div className="stat-card" style={{ marginTop: '20px' }}>
+      <div className="stat-card mt-20">
         <h3>Inventario Disponible</h3>
-        <div className="dashboard-grid" style={{ marginTop: '15px' }}>
+        <div className="dashboard-grid mt-15">
           <div><h4>Cabezas</h4><p>{stockDisponible.cabezas}</p></div>
           <div><h4>Torsos</h4><p>{stockDisponible.torsos}</p></div>
           <div><h4>Brazos</h4><p>{stockDisponible.brazos}</p></div>

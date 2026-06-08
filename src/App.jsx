@@ -71,7 +71,7 @@ function App() {
               <button className={filter === 'todas' ? 'active' : ''} onClick={() => setFilter('todas')}>Todas</button>
               <button className={filter === 'cabeza' ? 'active' : ''} onClick={() => setFilter('cabeza')}>Cabezas</button>
               <button className={filter === 'torso' ? 'active' : ''} onClick={() => setFilter('torso')}>Torsos</button>
-              <button className={filter === 'brazo' ? 'active' : ''} onClick={() => setFilter('brazo')}>Brasos</button>
+              <button className={filter === 'brazo' ? 'active' : ''} onClick={() => setFilter('brazo')}>Brazos</button>
               <button className={filter === 'pierna' ? 'active' : ''} onClick={() => setFilter('pierna')}>Piernas</button>
             </div>
             <PiezasList piezas={filteredPieces} />

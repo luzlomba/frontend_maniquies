@@ -95,8 +95,8 @@ function ManiquiRow({ maniqui, maniquies, cabezas, torsos, brazos, piernas, mode
             </select>
           </td>
           <td>
-            <button onClick={handleSave} className="btn-save" style={{ marginRight: '5px', backgroundColor: '#2ecc71', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Guardar</button>
-            <button onClick={handleCancel} className="btn-cancel" style={{ backgroundColor: '#95a5a6', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Cancelar</button>
+            <button onClick={handleSave} className="btn-save">Guardar</button>
+            <button onClick={handleCancel} className="btn-cancel">Cancelar</button>
           </td>
         </>
       ) : (
@@ -108,8 +108,8 @@ function ManiquiRow({ maniqui, maniquies, cabezas, torsos, brazos, piernas, mode
           <td>{piernaIzqActual?.nro_serie || '-'}</td>
           <td>{piernaDerActual?.nro_serie || '-'}</td>
           <td>
-            <button onClick={() => setIsEditing(true)} className="btn-edit" style={{ marginRight: '5px', backgroundColor: '#3498db', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Editar</button>
-            <button onClick={() => onDelete(maniqui.id_maniqui)} className="btn-delete" style={{ backgroundColor: '#e74c3c', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Desensamblar</button>
+            <button onClick={() => setIsEditing(true)} className="btn-action btn-edit">Editar</button>
+            <button onClick={() => onDelete(maniqui.id_maniqui)} className="btn-action btn-delete">Desensamblar</button>
           </td>
         </>
       )}
